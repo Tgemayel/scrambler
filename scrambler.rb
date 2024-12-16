@@ -141,42 +141,38 @@ class Scrambler < Thor
   end
 
   def scramble_text(text)
+    # Only preserve the markdown syntax characters themselves
     patterns = [
-      [/(\*\*.*?\*\*)/, 'bold'],
-      [/(\*.*?\*)/, 'italic'],
-      [/(\_.*?\_)/, 'underscore'],
-      [/(\[.*?\])/, 'bracket'],
-      [/(\(.*?\))/, 'parenthesis'],
-      [/(\#.*?\n)/, 'heading'],
-      [/(\`.*?\`)/, 'code'],
-      [/(\`\`\`[\s\S]*?\`\`\`)/, 'codeblock']
+      [/(\*\*)(.*?)(\*\*)/, 'bold'],         # Bold: preserve ** but scramble content
+      [/(\*)(.*?)(\*)/, 'italic'],           # Italic: preserve * but scramble content
+      [/(\_)(.*?)(\_)/, 'underscore'],       # Underscore: preserve _ but scramble content
+      [/(\[)(.*?)(\])(\(.*?\))/, 'link'],    # Links: preserve []() but scramble text
+      [/(\#\s*)(.*?)(\n)/, 'heading'],       # Headings: preserve # but scramble text
+      [/(\`)(.*?)(\`)/, 'code'],             # Inline code: preserve ` but scramble content
+      [/(\`\`\`)([\s\S]*?)(\`\`\`)/, 'codeblock']  # Code blocks: preserve ``` but scramble content
     ]
 
-    replacements = {}
-    counter = 0
-
-    patterns.each do |pattern, name|
-      text.scan(pattern) do |match|
-        placeholder = "__PLACEHOLDER_#{counter}__"
-        replacements[placeholder] = match[0]
-        text = text.gsub(match[0], placeholder)
-        counter += 1
+    patterns.each do |pattern, _type|
+      text = text.gsub(pattern) do |match|
+        case _type
+        when 'link'
+          # For links, preserve the URL part
+          link_text = scramble_word_completely($2)
+          "#{$1}#{link_text}#{$3}#{$4}"
+        when 'heading'
+          # For headings, preserve the # and newline
+          "#{$1}#{scramble_word_completely($2)}#{$3}"
+        else
+          # For other elements, scramble the content between markers
+          "#{$1}#{scramble_word_completely($2)}#{$3}"
+        end
       end
     end
 
-    scrambled_text = text.split(/\s+/).map do |word|
-      if word.start_with?('__PLACEHOLDER_')
-        word
-      else
-        scramble_word_completely(word)
-      end
+    # Scramble remaining regular text
+    text.split(/\s+/).map do |word|
+      scramble_word_completely(word)
     end.join(' ')
-
-    replacements.each do |placeholder, original|
-      scrambled_text = scrambled_text.gsub(placeholder, original)
-    end
-
-    scrambled_text
   end
 
   def scramble_word_completely(word)
