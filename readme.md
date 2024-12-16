@@ -80,9 +80,8 @@ I *really* hope my wife does not read my journal entries
 ```markdown
 # Kx$tBz mPq@
 
-R *really* Jk#n Qz wL&x Mvb pKt Yzx%B Nw jHq@xL vTp$iKs
+R *Jk#n@* Zx%B Qz wL&x Mvb pKt Yzx%B Nw jHq@xL vTp$iKs```
 ```
-
 ### After Encryption
 ```
 gAAAAABllYK6X9q4Z8J1X2fY7Qv_0jX5j1ZQ9K8e5tL2vQz8Yw9NmYH_6yRx7vDtZ8JKZV2x
